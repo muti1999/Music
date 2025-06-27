@@ -12,6 +12,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -74,9 +75,24 @@ class MainActivity : AppCompatActivity() {
     //logika "@+id/scrollbar_include" dan "@+id/scrollbarContainer"
     private lateinit var scrollBarContainer: LinearLayout
 
+    private var mediaPlayer: MediaPlayer? = null
+
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 100
+    }
+
+    private fun playMusic(musicData: MusicData) {
+        mediaPlayer?.release()
+        val uri = ContentUris.withAppendedId(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            musicData.id
+        )
+        mediaPlayer = MediaPlayer().apply {
+            setDataSource(this@MainActivity, uri)
+            prepare()
+            start()
+        }
     }
 
     // Tentukan permission yang dibutuhkan sesuai versi Android
@@ -97,6 +113,12 @@ class MainActivity : AppCompatActivity() {
             val indexInRecyclerView = indexInList + 1 // +1 karena header
             layoutManager?.scrollToPositionWithOffset(indexInRecyclerView, 0)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
 
@@ -588,7 +610,10 @@ class MainActivity : AppCompatActivity() {
 class MusicAdapter(
     private val musicList: List<MusicData>,
     private val contentResolver: ContentResolver
+    private val onItemClick: (MusicData) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
@@ -605,6 +630,15 @@ class MusicAdapter(
         val iconMusic: ImageView = itemView.findViewById(R.id.iconMusic)
         val textTitle: TextView = itemView.findViewById(R.id.textTitle)
         val textArtist: TextView = itemView.findViewById(R.id.textArtist)
+
+        init {
+            itemView.setOnClickListener {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION && position > 0) { // 0 = header
+                    onItemClick(musicList[position - 1])
+                }
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
