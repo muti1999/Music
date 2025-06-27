@@ -451,7 +451,9 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        recyclerView.adapter = MusicAdapter(filteredList, contentResolver)
+        MusicAdapter(musicList, contentResolver) { musicData ->
+            playMusic(musicData)
+        }
     }
 
 
@@ -499,7 +501,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        recyclerView.adapter = MusicAdapter(musicList, contentResolver)
+        MusicAdapter(musicList, contentResolver) { musicData ->
+            playMusic(musicData)
+        }
 
         // === SCROLLBAR OTOMATIS BERGERAK SAAT SCROLL LIST ===
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -591,7 +595,9 @@ class MainActivity : AppCompatActivity() {
         musicList.sortBy { it.title.lowercase() }
 
         // Set adapter dan jumlah lagu
-        musicAdapter = MusicAdapter(musicList.toMutableList(), contentResolver)
+        MusicAdapter(musicList, contentResolver) { musicData ->
+            playMusic(musicData)
+        }
         recyclerView.adapter = musicAdapter
         textLabel.text = "Total Songs : ${musicList.size}"
     }
