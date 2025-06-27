@@ -77,11 +77,6 @@ class MainActivity : AppCompatActivity() {
 
     private var mediaPlayer: MediaPlayer? = null
 
-
-    companion object {
-        private const val PERMISSION_REQUEST_CODE = 100
-    }
-
     private fun playMusic(musicData: MusicData) {
         mediaPlayer?.release()
         val uri = ContentUris.withAppendedId(
@@ -93,6 +88,11 @@ class MainActivity : AppCompatActivity() {
             prepare()
             start()
         }
+    }
+
+
+    companion object {
+        private const val PERMISSION_REQUEST_CODE = 100
     }
 
     // Tentukan permission yang dibutuhkan sesuai versi Android
@@ -322,7 +322,9 @@ class MainActivity : AppCompatActivity() {
         textLabel = findViewById(R.id.songCount)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        musicAdapter = MusicAdapter(musicList.toMutableList(), contentResolver)
+        musicAdapter = MusicAdapter(musicList, contentResolver) { musicData ->
+            playMusic(musicData)
+        }
         recyclerView.adapter = musicAdapter
 
 
@@ -609,8 +611,8 @@ class MainActivity : AppCompatActivity() {
 
 class MusicAdapter(
     private val musicList: List<MusicData>,
-    private val contentResolver: ContentResolver
-    private val onItemClick: (MusicData) -> Unit
+    private val contentResolver: ContentResolver,
+    private val onItemClick: (MusicData) -> Unit // Tambahkan ini!
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -634,12 +636,13 @@ class MusicAdapter(
         init {
             itemView.setOnClickListener {
                 val position = bindingAdapterPosition
-                if (position != RecyclerView.NO_POSITION && position > 0) { // 0 = header
+                if (position != RecyclerView.NO_POSITION && position > 0) { // karena ada header
                     onItemClick(musicList[position - 1])
                 }
             }
         }
     }
+
 
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM
