@@ -1,0 +1,15 @@
+<!-- res/drawable/scrollbar_abcd.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF4081"/> <!-- Warna saat ditekan -->
+            <corners android:radius="100dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#26FFFFFF"/> <!-- Warna normal -->
+            <corners android:radius="100dp"/>
+        </shape>
+    </item>
+</selector>
